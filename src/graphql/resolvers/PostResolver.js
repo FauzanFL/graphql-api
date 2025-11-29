@@ -40,3 +40,48 @@ export const postMutations = {
     },
   },
 };
+
+export const putMutations = {
+  updatePost: {
+    type: PostType,
+    description: "Update a post",
+    args: {
+      id: { type: GraphQLNonNull(GraphQLInt) },
+      content: { type: GraphQLNonNull(GraphQLString) },
+      userId: { type: GraphQLNonNull(GraphQLInt) },
+    },
+    resolve: (parent, { id, content }) => {
+      const post = posts.find((post) => post.id === id);
+      if (!post) {
+        throw new Error("Post not found");
+      }
+      if (post.userId !== userId) {
+        throw new Error("Unauthorized");
+      }
+      post.content = content;
+      return post;
+    },
+  },
+};
+
+export const deleteMutations = {
+  deletePost: {
+    type: PostType,
+    description: "Delete a post",
+    args: {
+      id: { type: GraphQLNonNull(GraphQLInt) },
+      userId: { type: GraphQLNonNull(GraphQLInt) },
+    },
+    resolve: (parent, { id }) => {
+      const post = posts.find((post) => post.id === id);
+      if (!post) {
+        throw new Error("Post not found");
+      }
+      if (post.userId !== userId) {
+        throw new Error("Unauthorized");
+      }
+      posts.splice(posts.indexOf(post), 1);
+      return post;
+    },
+  },
+};

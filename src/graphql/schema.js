@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
 import { userMutations, userQueries } from "./resolvers/UserResolver";
-import { postMutations, postQueries } from "./resolvers/PostResolver";
+import { deleteMutations, postMutations, postQueries, putMutations } from "./resolvers/PostResolver";
 
 const rootQueryType = new GraphQLObjectType({
   name: "RootQuery",
@@ -17,6 +17,8 @@ const rootMutationType = new GraphQLObjectType({
   fields: () => ({
     ...userMutations,
     ...postMutations,
+    ...putMutations,
+    ...deleteMutations
   }),
 });
 
