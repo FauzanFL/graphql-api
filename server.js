@@ -1,14 +1,13 @@
 import express from "express";
-import { graphqlHTTP } from "express-graphql";
-import { schema } from "./src/graphql/schema";
+import {createHandler} from "graphql-http/lib/use/express";
+import { schema } from "./src/graphql/schema.js";
 
 const app = express();
 
 app.use(
   "/graphql",
-  graphqlHTTP({
+  createHandler({
     schema: schema,
-    graphiql: true,
   })
 );
 

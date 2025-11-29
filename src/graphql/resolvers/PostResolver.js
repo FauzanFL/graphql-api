@@ -4,19 +4,19 @@ import {
   GraphQLNonNull,
   GraphQLString,
 } from "graphql";
-import { PostType } from "../types/PostType";
-import { posts, users } from "../../data/mock_data";
+import { PostType } from "../types/PostType.js";
+import { posts, users } from "../../data/mock_data.js";
 
 export const postQueries = {
   posts: {
-    type: GraphQLList(PostType),
+    type: new GraphQLList(PostType),
     description: "List of posts",
     resolve: () => posts,
   },
   post: {
     type: PostType,
     description: "Get single post by ID",
-    args: { id: { type: GraphQLNonNull(GraphQLInt) } },
+    args: { id: { type: new GraphQLNonNull(GraphQLInt) } },
     resolve: (parent, args) => posts.find((post) => post.id === args.id),
   },
 };
@@ -26,31 +26,30 @@ export const postMutations = {
     type: PostType,
     description: "Add a new post",
     args: {
-      content: { type: GraphQLNonNull(GraphQLString) },
-      userId: { type: GraphQLNonNull(GraphQLInt) },
+      title: { type: new GraphQLNonNull(GraphQLString) },
+      body: { type: new GraphQLNonNull(GraphQLString) },
+      userId: { type: new GraphQLNonNull(GraphQLInt) },
     },
-    resolve: (parent, { content, userId }) => {
+    resolve: (parent, { title, body, userId }) => {
       const userExists = users.some((user) => user.id === userId);
       if (!userExists) {
         throw new Error("User not found");
       }
-      const newPost = { id: posts.length + 1, content, userId };
+      const newPost = { id: posts.length + 1, title, body, userId };
       posts.push(newPost);
       return newPost;
     },
   },
-};
-
-export const putMutations = {
   updatePost: {
     type: PostType,
     description: "Update a post",
     args: {
-      id: { type: GraphQLNonNull(GraphQLInt) },
-      content: { type: GraphQLNonNull(GraphQLString) },
-      userId: { type: GraphQLNonNull(GraphQLInt) },
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      title: { type: GraphQLString },
+      body: { type: GraphQLString },
+      userId: { type: new GraphQLNonNull(GraphQLInt) },
     },
-    resolve: (parent, { id, content }) => {
+    resolve: (parent, { id, title, body, userId }) => {
       const post = posts.find((post) => post.id === id);
       if (!post) {
         throw new Error("Post not found");
@@ -58,21 +57,23 @@ export const putMutations = {
       if (post.userId !== userId) {
         throw new Error("Unauthorized");
       }
-      post.content = content;
+
+      newTitle = title ? title : post.title;
+      newBody = body ? body : post.body;
+
+      post.title = newTitle;
+      post.body = newBody;
       return post;
     },
   },
-};
-
-export const deleteMutations = {
   deletePost: {
     type: PostType,
     description: "Delete a post",
     args: {
-      id: { type: GraphQLNonNull(GraphQLInt) },
-      userId: { type: GraphQLNonNull(GraphQLInt) },
+      id: { type: new GraphQLNonNull(GraphQLInt) },
+      userId: { type: new GraphQLNonNull(GraphQLInt) },
     },
-    resolve: (parent, { id }) => {
+    resolve: (parent, { id, userId }) => {
       const post = posts.find((post) => post.id === id);
       if (!post) {
         throw new Error("Post not found");
