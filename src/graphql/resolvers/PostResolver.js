@@ -7,6 +7,8 @@ import {
 import { PostType } from "../types/PostType.js";
 import { posts, users } from "../../data/mock_data.js";
 
+let POST_ID = 0;
+
 export const postQueries = {
   posts: {
     type: new GraphQLList(PostType),
@@ -35,7 +37,9 @@ export const postMutations = {
       if (!userExists) {
         throw new Error("User not found");
       }
-      const newPost = { id: posts.length + 1, title, body, userId };
+
+      const newId = POST_ID++;
+      const newPost = { id: newId, title, body, userId };
       posts.push(newPost);
       return newPost;
     },
